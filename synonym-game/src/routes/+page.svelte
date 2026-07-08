@@ -2,12 +2,9 @@
 	import { onMount } from 'svelte';
 	import { easyLevel, medLevel, hardLevel } from '../lib/components/data';
 	import title from '../lib/assets/imgs/title.png';
-	import word1 from '../lib/assets/imgs/extraordinary.png';
-	import word2 from '../lib/assets/imgs/innovative.png';
-	import word3 from '../lib/assets/imgs/intelligent.png';
-	// @ts-ignore
-	// @ts-ignore
-	const { form } = $props();
+	import Timer from '../lib/components/timer.svelte';
+
+	let { data } = $props();
 
 	/*
         What's needed:
@@ -22,34 +19,18 @@
 	//everything that needs to tracked and updated
 
 	let correctAns = $state(0);
+	let isItPaused = $state(false);
+	let thingy = $state('Pause');
 	/**
 	 * @type {boolean | null}
 	 */
 	let result = $state(null);
 	let questionLvl = $state(1);
-	/**
-	 * @type {any[]}
-	 */
-	// @ts-ignore
-	let pts = $state(1);
-	// @ts-ignore
-	/**
-	 * @type {number[]}
-	 */
-	let totalPts = $state([]);
-	//it's adding the entire array whenever the function is run, definitely NOT what you want it to do
-	function calc() {
-		// @ts-ignore
-		let holder = 0;
-		totalPts?.forEach((x) => {
-			holder += x;
-		});
-		totalPts = [];
-		totalPts.push(holder);
-		displayPts = holder;
 
-		console.log(totalPts);
-	}
+	let displayPts = $state(0);
+	// @ts-ignore
+	/**
+
 	let displayPts = $state(0);
 
 	/**
@@ -63,9 +44,19 @@
 	 */
 	let synonyms = $state([]);
 	let lvlWord = $state(chooseWord());
+	/*const easyAvailable = easyLevel.filter(word => !word.played);
+	const medAvailable = medLevel.filter(word => !word.played);
+	const hardAvailable = hardLevel.filter(word => !word.played);*/
+
+	/*const gameResult = {
+		score: displayPts,
+		correctAnswers: correctAns,
+		completedAt: Date.now()
+	};
+	//let history = JSON.parse(localStorage.getItem('gameHistory')) || [];
+	//let highScore = Number(localStorage.getItem('highScore')) || 0;*/
 
 	function chooseWord() {
-		//need to add that it cannot choose a word that's already been done before
 		console.log(randomNo);
 		if (questionLvl < 11) {
 			if (correctAns <= 3) {
@@ -104,11 +95,21 @@
 			} else {
 				let lvlQ = 'done';
 				result = null;
+				/*history.push(gameResult);
+				localStorage.setItem('gameHistory', JSON.stringify(history));
+				if (displayPts > highScore) {
+					localStorage.setItem('highScore', displayPts);
+				}*/
 				return lvlQ;
 			}
 		} else {
 			let lvlQ = 'done';
 			result = null;
+			/*history.push(gameResult);
+			localStorage.setItem('gameHistory', JSON.stringify(history));
+			if (displayPts > highScore) {
+				localStorage.setItem('highScore', displayPts);
+			}*/
 			return lvlQ;
 		}
 	}
@@ -129,8 +130,6 @@
 
 		return sanitizedInput;
 	}
-
-	//const getSynon = searchSynon();
 
 	async function searchSynon() {
 		const response = await fetch(`/api?word=${lvlWord}`);
@@ -165,34 +164,20 @@
 			result = false;
 		}
 		console.log(userInputs);
-		if (correctAns <= 2) {
-			// @ts-ignore
-			pts = 1;
-		} else if (correctAns >= 3 && correctAns < 6) {
-			// @ts-ignore
-			pts = 2;
-		} else {
-			// @ts-ignore
-			pts = 3;
-		}
 	}
 
-	/**
-	 * @param {{ target: HTMLFormElement | undefined; }} event
-	 */
-	function nextQ(event) {
-		//update questionLvl, totalPts, userInput and then trigger chooseWord again
+	function nextQ() {
+		//update questionLvl, displayPts, userInput and then trigger chooseWord again
 		if (result === true) {
 			if (correctAns <= 2) {
-				totalPts.push(1);
+				displayPts += 1;
 			} else if (correctAns >= 3 && correctAns < 6) {
-				totalPts.push(2);
+				displayPts += 2;
 			} else {
-				totalPts.push(3);
+				displayPts += 3;
 			}
 		} // @ts-ignore
-		console.log(totalPts);
-		calc();
+		console.log(displayPts);
 		questionLvl += 1;
 
 		synonyms = [];
@@ -210,7 +195,7 @@
 {#if lvlWord === 'done'}
 	<h1>CONGRATULATIONS</h1>
 	<h2># of Correct Answers: {correctAns}</h2>
-	<h2>Total Points: {totalPts}</h2>
+	<h2>Total Points: {displayPts}</h2>
 	<h2>Your Best Answers:</h2>
 	<br />
 	<h1>Play Again?</h1>
@@ -257,7 +242,7 @@
 
 	{#if result === true}
 		<h1>That's correct!</h1>
-		<h3>+{pts}</h3>
+		<!--<h3>+{pts}</h3>-->
 		<button on:click={nextQ}>Next Word</button>
 	{:else if result === false}
 		<h1>Incorrect :c On to the next!</h1>
