@@ -1,8 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
-	import { easyLevel, medLevel, hardLevel } from '../lib/components/data';
-	import title from '../lib/assets/imgs/title.png';
-	import Timer from '../lib/components/timer.svelte';
+	import { easyLevel, medLevel, hardLevel } from '../../../lib/components/data';
+	import Timer from '../../../lib/components/timer.svelte';
 
 	let { data } = $props();
 
@@ -44,17 +43,13 @@
 	 */
 	let synonyms = $state([]);
 	let lvlWord = $state(chooseWord());
-	/*const easyAvailable = easyLevel.filter(word => !word.played);
-	const medAvailable = medLevel.filter(word => !word.played);
-	const hardAvailable = hardLevel.filter(word => !word.played);*/
 
-	/*const gameResult = {
-		score: displayPts,
-		correctAnswers: correctAns,
-		completedAt: Date.now()
-	};
-	//let history = JSON.parse(localStorage.getItem('gameHistory')) || [];
-	//let highScore = Number(localStorage.getItem('highScore')) || 0;*/
+	/**
+	 * @type {any[] | null | undefined}
+	 */
+	let gameHistory = $state([]);
+	let highScore = $state(0);
+	let gameIsSaved = false;
 
 	function chooseWord() {
 		console.log(randomNo);
@@ -62,54 +57,44 @@
 			if (correctAns <= 3) {
 				if (easyLevel[randomNo].played === true) {
 					randomNo = Math.floor(Math.random() * 9);
-					easyLevel[randomNo].played = true;
 					let lvlQ = easyLevel[randomNo].word;
+					easyLevel[randomNo].played = true;
 					return lvlQ;
 				} else {
-					easyLevel[randomNo].played = true;
 					let lvlQ = easyLevel[randomNo].word;
+					easyLevel[randomNo].played = true;
 					return lvlQ;
 				}
 			} else if (correctAns >= 4 && correctAns < 7) {
 				if (medLevel[randomNo].played === true) {
 					randomNo = Math.floor(Math.random() * 9);
-					medLevel[randomNo].played = true;
 					let lvlQ = medLevel[randomNo].word;
+					medLevel[randomNo].played = true;
 					return lvlQ;
 				} else {
-					medLevel[randomNo].played = true;
 					let lvlQ = medLevel[randomNo].word;
+					medLevel[randomNo].played = true;
 					return lvlQ;
 				}
 			} else if (correctAns >= 7 && correctAns <= 10) {
 				if (hardLevel[randomNo].played === true) {
 					randomNo = Math.floor(Math.random() * 9);
-					hardLevel[randomNo].played = true;
 					let lvlQ = hardLevel[randomNo].word;
+					hardLevel[randomNo].played = true;
 					return lvlQ;
 				} else {
-					hardLevel[randomNo].played = true;
 					let lvlQ = hardLevel[randomNo].word;
+					hardLevel[randomNo].played = true;
 					return lvlQ;
 				}
 			} else {
 				let lvlQ = 'done';
 				result = null;
-				/*history.push(gameResult);
-				localStorage.setItem('gameHistory', JSON.stringify(history));
-				if (displayPts > highScore) {
-					localStorage.setItem('highScore', displayPts);
-				}*/
 				return lvlQ;
 			}
 		} else {
 			let lvlQ = 'done';
 			result = null;
-			/*history.push(gameResult);
-			localStorage.setItem('gameHistory', JSON.stringify(history));
-			if (displayPts > highScore) {
-				localStorage.setItem('highScore', displayPts);
-			}*/
 			return lvlQ;
 		}
 	}
@@ -184,11 +169,43 @@
 		result = null;
 		randomNo = Math.floor(Math.random() * 9);
 		lvlWord = chooseWord();
+
+		if (lvlWord === 'done') {
+			saveGame();
+			return;
+		}
 		searchSynon();
 	} /**/
 
+	function saveGame() {
+		if (gameIsSaved) return;
+		gameIsSaved = true;
+
+		const gameResult = {
+			score: displayPts,
+			correctAns: correctAns,
+			completedAt: Date.now(),
+			totalQuestions: questionLvl,
+			answers: userInputs
+		};
+		const prevGames = JSON.parse(localStorage.getItem('gameHistory')) || [];
+		prevGames.push(gameResult);
+
+		localStorage.setItem('gameHistory', JSON.stringify(prevGames));
+
+		const currentHighScore = Number(localStorage.getItem('highscore')) || 0;
+
+		if (displayPts > currentHighScore) {
+			localStorage.setItem('highScore', JSON.stringify(displayPts));
+		}
+	}
+
 	onMount(() => {
 		searchSynon();
+
+		gameHistory = JSON.parse(localStorage.getItem('gameHistory')) || [];
+
+		highScore = Number(localStorage.getItem('highScore')) || 0;
 	});
 </script>
 
@@ -199,6 +216,16 @@
 	<h2>Your Best Answers:</h2>
 	<br />
 	<h1>Play Again?</h1>
+
+	<h1>Game History</h1>
+	<!--Need to change Date.now() to a better format-->
+	<ol>
+		{#each gameHistory as entry}
+			<li>
+				Final Score: {entry.score} Completed At: {entry.completedAt} Correct Answers: {entry.correctAns}
+			</li>
+		{/each}
+	</ol>
 {:else}
 	<div class="grid">
 		<div class="col-span-1 grid-cols-1" id="instructions">
