@@ -3,8 +3,6 @@
 	import { easyLevel, medLevel, hardLevel } from '../../../lib/components/data';
 	import Timer from '../../../lib/components/timer.svelte';
 
-	let { data } = $props();
-
 	/*
         What's needed:
         -a bank of words to be chosen at random, different array for each level
@@ -184,7 +182,7 @@
 		const gameResult = {
 			score: displayPts,
 			correctAns: correctAns,
-			completedAt: Date.now(),
+			completedAt: new Date(),
 			totalQuestions: questionLvl,
 			answers: userInputs
 		};
@@ -210,12 +208,12 @@
 </script>
 
 {#if lvlWord === 'done'}
-	<h1>CONGRATULATIONS</h1>
+	<h1><strong>CONGRATULATIONS</strong></h1>
 	<h2># of Correct Answers: {correctAns}</h2>
 	<h2>Total Points: {displayPts}</h2>
 	<h2>Your Best Answers:</h2>
 	<br />
-	<h1>Play Again?</h1>
+	<h1><strong>Play Again?</strong></h1>
 
 	<h1>Game History</h1>
 	<!--Need to change Date.now() to a better format-->
@@ -228,14 +226,6 @@
 	</ol>
 {:else}
 	<div class="grid">
-		<div class="col-span-1 grid-cols-1" id="instructions">
-			<img src={title} alt="Synonym Match!" width="60%" />
-			<h3>
-				Enter the best Synonym for the presented word! The more you get right, the harder the worda
-				become.
-			</h3>
-		</div>
-		<br />
 		<div class="col-span-1 grid-cols-2">
 			<h1><strong>Level: </strong> {questionLvl} <strong> Pts: </strong> {displayPts}</h1>
 
@@ -295,9 +285,16 @@
 		font-family: 'Special Elite';
 		margin: 3%;
 	}
-	input,
+	input {
+		border: solid 1px white;
+		border-radius: 8px;
+		margin: 2%;
+		padding: 1%;
+	}
 	button {
 		border: solid 1px white;
+		background-color: rgb(236, 209, 0);
+		color: #0c000f;
 		border-radius: 8px;
 		margin: 2%;
 		padding: 1%;
