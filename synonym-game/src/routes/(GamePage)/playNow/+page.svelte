@@ -207,67 +207,70 @@
 	});
 </script>
 
-{#if lvlWord === 'done'}
-	<h1><strong>CONGRATULATIONS</strong></h1>
-	<h2># of Correct Answers: {correctAns}</h2>
-	<h2>Total Points: {displayPts}</h2>
-	<h2>Your Best Answers:</h2>
-	<br />
-	<h1><strong>Play Again?</strong></h1>
-
-	<h1>Game History</h1>
-	<!--Need to change Date.now() to a better format-->
-	<ol>
-		{#each gameHistory as entry}
-			<li>
-				Final Score: {entry.score} Completed At: {entry.completedAt} Correct Answers: {entry.correctAns}
-			</li>
-		{/each}
-	</ol>
-{:else}
-	<div class="grid">
-		<div class="col-span-1 grid-cols-2">
-			<h1><strong>Level: </strong> {questionLvl} <strong> Pts: </strong> {displayPts}</h1>
-
-			<!--tally up all the points in the total points array-->
-		</div>
-	</div>
-	<br />
-	<h2>What's a Synonym for:</h2>
-	<!---->
-	<h1><strong>{lvlWord}</strong></h1>
-
-	{#if result === true || false}
-		<div class="synonyms">
-			<span>
-				<!--eslint-disable-next-line svelte/require-each-key-->
-				{#each synonyms as synonym}
-					{synonym},
-				{/each}
-			</span>
-		</div>
-	{:else}
+<div class="game">
+	{#if lvlWord === 'done'}
+		<h1><strong>CONGRATULATIONS</strong></h1>
+		<h2># of Correct Answers: {correctAns}</h2>
+		<h2>Total Points: {displayPts}</h2>
+		<h2>Your Best Answers:</h2>
 		<br />
-	{/if}
+		<h1><strong>Play Again?</strong></h1>
 
-	<!--Didn't actually need +page.Server.js because all sanitization and grading is easier done on the client side. Also, submitting the form caused the entire page to rerender which wasn't really helpful since I don't want to immediately go to a new page.-->
-	<form method="POST" action="?/checkInput" on:submit|preventDefault={grader}>
-		<label for="synonInput">Synonym: </label>
-		<input type="text" name="synonInput" id="synonInput" placeholder="Enter Synonym Here..." />
-		<input type="submit" name="submit" id="submit" />
-	</form>
-
-	{#if result === true}
-		<h1>That's correct!</h1>
-		<!--<h3>+{pts}</h3>-->
-		<button on:click={nextQ}>Next Word</button>
-	{:else if result === false}
-		<h1>Incorrect :c On to the next!</h1>
-		<button on:click={nextQ}>Next Word</button>
+		<h1>Game History</h1>
+		<!--Need to change Date.now() to a better format-->
+		<ol>
+			{#each gameHistory as entry}
+				<li>
+					Final Score: {entry.score}, Completed At: {entry.completedAt}, Correct Answers: {entry.correctAns}
+				</li>
+			{/each}
+		</ol>
 	{:else}
+		<div>
+			<div>
+				<span class="trackers"><strong>Level: </strong> {questionLvl} </span>
+				<span class="trackers"><strong> Pts: </strong> {displayPts}</span>
+
+				<!--tally up all the points in the total points array-->
+			</div>
+		</div>
 		<br />
+		<h1 class="mainText">What's a Synonym for:</h1>
+		<!---->
+		<h1 class="mainText"><strong>{lvlWord}</strong></h1>
+
+		{#if result === true || false}
+			<div class="synonyms">
+				<span>
+					<!--eslint-disable-next-line svelte/require-each-key-->
+					{#each synonyms as synonym}
+						{synonym},
+					{/each}
+				</span>
+			</div>
+		{:else}
+			<br />
+		{/if}
+
+		<!--Didn't actually need +page.Server.js because all sanitization and grading is easier done on the client side. Also, submitting the form caused the entire page to rerender which wasn't really helpful since I don't want to immediately go to a new page.-->
+		<form class="form" method="POST" action="?/checkInput" on:submit|preventDefault={grader}>
+			<label for="synonInput">Synonym: </label>
+			<input type="text" name="synonInput" id="synonInput" placeholder="Enter Synonym Here..." />
+			<input type="submit" name="submit" id="submit" />
+		</form>
+
+		{#if result === true}
+			<h1>That's correct!</h1>
+			<!--<h3>+{pts}</h3>-->
+			<button on:click={nextQ}>Next Word</button>
+		{:else if result === false}
+			<h1>Incorrect :c On to the next!</h1>
+			<button on:click={nextQ}>Next Word</button>
+		{:else}
+			<br />
+		{/if}
 	{/if}
-{/if}
+</div>
 
 <!---->
 
@@ -285,6 +288,7 @@
 		font-family: 'Special Elite';
 		margin: 3%;
 	}
+
 	input {
 		border: solid 1px white;
 		border-radius: 8px;
@@ -305,11 +309,33 @@
 		box-shadow: inset -2px 1px;
 		border: solid 1px rgb(70, 53, 81);
 	}
+	.game {
+		margin: 3%;
+		padding: 1%;
+	}
 	.header {
 		display: block;
 		width: 80%;
 		height: 20%;
 		margin: 2%;
+	}
+	.mainText {
+		font-size: 2em;
+		text-align: center;
+		margin: 1%;
+	}
+	.form {
+		text-align: center;
+		align-items: center;
+		margin: 1%;
+		padding: 1%;
+		input {
+			background-color: #390048;
+			color: rgb(255, 230, 41);
+		}
+		label {
+			font-size: 1.15em;
+		}
 	}
 	.synonyms {
 		display: flexbox;
@@ -325,5 +351,14 @@
 			height: 100%;
 			inline-size: min-content;
 		}
+	}
+	.trackers {
+		font-size: 1.25em;
+		border: 1px solid #14001a;
+		border-radius: 8px;
+		background-color: #390048;
+		color: rgb(255, 230, 41);
+		padding: 1%;
+		margin: 2%;
 	}
 </style>

@@ -1,6 +1,5 @@
 <script>
 	import { onMount } from 'svelte';
-	import { ModuleRunner } from 'vite/module-runner';
 	//get data from local sotrage, might need to $props() high score?
 	/**
 	 * @type {any[] | null | undefined}
@@ -25,7 +24,6 @@
 
 	onMount(() => {
 		gameHistory = JSON.parse(localStorage.getItem('gameHistory')) || [];
-		$inspect(gameHistory);
 	});
 </script>
 
@@ -73,7 +71,11 @@
 						<ul>
 							{#each entry.answers as answer}
 								<li id={correct(answer.correct)}>
-									The Word was: {answer.word}, Your Answer: {answer.userInput}
+									<strong>The Word was:</strong>
+									{answer.word},
+									<br />
+									<strong>Your Answer:</strong>
+									{answer.userInput}
 								</li>
 							{/each}
 						</ul>
@@ -95,7 +97,8 @@
 		margin: 2%;
 		padding: 5%;
 		th {
-			color: rgb(236, 209, 0);
+			color: #130817;
+			background-color: rgb(222, 177, 0);
 			margin: 3%;
 			padding: 5%;
 			border: 1px solid white;
@@ -107,17 +110,17 @@
 			padding: 2%;
 			text-align: center;
 		}
-		td:hover {
-			background-color: rgb(236, 209, 0);
+		tr:hover {
+			background-color: #210029;
 			border: 1px solid white;
-			color: #0c000f !important;
+			color: white !important;
 			margin: 1%;
 			padding: 3%;
 			#correctStyle {
-				color: rgb(18, 31, 0);
+				color: rgb(149, 255, 0);
 			}
 			#wrongStyle {
-				color: rgb(40, 0, 0);
+				color: rgb(255, 0, 0);
 			}
 		}
 	}
