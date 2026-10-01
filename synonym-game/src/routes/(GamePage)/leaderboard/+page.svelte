@@ -1,12 +1,8 @@
 <script>
 	import { onMount } from 'svelte';
 	//get data from local sotrage, might need to $props() high score?
-	/**
-	 * @type {any[] | null | undefined}
-	 */
-	let gameHistory = $state([]);
 
-	let clicked = $state(false);
+	let clicked = $state(null);
 	/**
 	 * @param {any} input
 	 */
@@ -21,19 +17,33 @@
 	}
 
 	//create a filter function
+	let filterBy = $state('date');
+	//filterFunctions();
 
-	onMount(() => {
-		gameHistory = JSON.parse(localStorage.getItem('gameHistory')) || [];
+	onMount(() => {});
+	let gameHistory = JSON.parse(localStorage.getItem('gameHistory'));
+	let filterFunctions = $derived.by(() => {
+		if (filterBy === 'highScore') {
+			return gameHistory?.toSorted(
+				(/** @type {{ score: number; }} */ a, /** @type {{ score: number; }} */ b) =>
+					b.score - a.score
+			);
+		} else {
+			return gameHistory?.toSorted(
+				(/** @type {{ completedAt: number; }} */ a, /** @type {{ completedAt: number; }} */ b) =>
+					b.completedAt - a.completedAt
+			);
+		}
 	});
 </script>
 
 <h1>Leaderboard</h1>
 <nav>
 	<!--Filter, delete all data-->
-	<select name="filterBy">
-		<option value="highScore">High Score</option>
-		<option value="time">Time</option>
+	<select name="filterBy" bind:value={filterBy} onchange={filterFunctions}>
 		<option value="date">Date</option>
+		<option value="highScore">High Score</option>
+		<!--<option value="time">Time</option>-->
 	</select>
 	<button
 		onclick={() => {
@@ -52,7 +62,7 @@
 		</tr>
 	</thead>
 	<!----><tbody>
-		{#each gameHistory as entry}
+		{#each filterFunctions as entry}
 			<tr>
 				<td>{entry.completedAt}</td>
 				<td>{entry.score}</td>

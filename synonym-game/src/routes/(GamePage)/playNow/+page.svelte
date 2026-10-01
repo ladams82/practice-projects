@@ -148,8 +148,14 @@
 		}
 		console.log(userInputs);
 	}
+	gameHistory?.toSorted(
+		(/** @type {{ score: number; }} */ a, /** @type {{ score: number; }} */ b) => b.score - a.score
+	);
 
-	function nextQ() {
+	/**
+	 * @param {{ target: HTMLFormElement | undefined; }} event
+	 */
+	function nextQ(event) {
 		//update questionLvl, displayPts, userInput and then trigger chooseWord again
 		if (result === true) {
 			if (correctAns <= 2) {
@@ -182,7 +188,7 @@
 		const gameResult = {
 			score: displayPts,
 			correctAns: correctAns,
-			completedAt: new Date(),
+			completedAt: new Date().toDateString(),
 			totalQuestions: questionLvl,
 			answers: userInputs
 		};
@@ -221,7 +227,7 @@
 		<ol>
 			{#each gameHistory as entry}
 				<li>
-					Final Score: {entry.score}, Completed At: {entry.completedAt}, Correct Answers: {entry.correctAns}
+					Final Score: {entry.score}, Completed At: {entry.completedAt}
 				</li>
 			{/each}
 		</ol>
@@ -296,12 +302,16 @@
 		padding: 1%;
 	}
 	button {
-		border: solid 1px white;
+		border: solid 1px rgb(73, 64, 0);
 		background-color: rgb(236, 209, 0);
 		color: #0c000f;
 		border-radius: 8px;
 		margin: 2%;
 		padding: 1%;
+	}
+	#submit {
+		background-color: #390048;
+		color: rgb(255, 230, 41);
 	}
 	#submit:hover {
 		color: rgb(109, 87, 114);
@@ -329,10 +339,7 @@
 		align-items: center;
 		margin: 1%;
 		padding: 1%;
-		input {
-			background-color: #390048;
-			color: rgb(255, 230, 41);
-		}
+
 		label {
 			font-size: 1.15em;
 		}
